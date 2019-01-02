@@ -8,10 +8,13 @@
 	<name>KDHost - CLI Host Client</name>
 
 	<properties>
-		<java.version>11</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>11</java.version>
+		<junit.version>5.3.1</junit.version>
+		<sanchezjdbc.version>3.0.1</sanchezjdbc.version>
+		<picocli.version>3.8.2</picocli.version>
 	</properties>
 	<build>
 		<resources>
@@ -74,12 +77,39 @@
 			<!-- For command line parameter/options parsing -->
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
-			<version>3.8.2</version>
+			<version>${picocli.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>sanchez.jdbc</groupId>
 			<artifactId>scjdbc</artifactId>
-			<version>3.0.1</version>
+			<version>${sanchezjdbc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<repositories>
