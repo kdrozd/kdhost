@@ -14,20 +14,15 @@ import picocli.CommandLine.Parameters;
 		versionProvider = in.drozd.kdhost.KDHostVersionInformation.class // Version information provider
 )
 public class KDHostMain implements Runnable {
-	//TODO: Add logging
+	// TODO: Add logging
 	public static void main(String[] args) {
-		try {
-			CommandLine.run(new KDHostMain(), args);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.err.println(e.getMessage());
-		}
+		CommandLine cmd = new CommandLine(new KDHostMain());
+		cmd.parseWithHandlers(new CommandLine.RunFirst().andExit(0), CommandLine.defaultExceptionHandler().andExit(1), args);
 	}
 
 	@Override
 	public void run() {
-		
+
 	}
 
 	@Command(description = "Send element(s) to host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.KDHostVersionInformation.class)
@@ -112,6 +107,16 @@ public class KDHostMain implements Runnable {
 			@Option(names = "-n", description = "Show element names instead of file names", defaultValue = "false") boolean asNames,
 			@Option(names = "-t", description = "List subelement of specific table.", paramLabel = "TABLE-NAME", defaultValue = "") String table,
 			@Parameters(index = "0..*", arity = "0..*", description = "Element types to list from host", paramLabel = "ELEMENTS") List<KDElementTypes> elementTypes) {
+
+		// Offline actions
+		if (listListableTypes) {
+			return;
+		}
+		if (listAllTypes) {
+			return;
+		}
+
+		// This actions will use host connection
 
 	}
 
