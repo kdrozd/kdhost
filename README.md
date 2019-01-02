@@ -31,7 +31,7 @@ p761env get MRPC029.PROC
 
 Requirements:
 
-* Java (JRE) 1.8+
+* Java (JRE) 11+
 * Network connection to host (PIPv0.2+), but P7.5+ is recomended.
 
 ## Compatiblity

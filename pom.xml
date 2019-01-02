@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>in.drozd.kdhost</groupId>
+	<artifactId>kdhost</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>KDHost - CLI Host Client</name>
+
+	<properties>
+		<java.version>11</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<!-- Run shade goal on package phase -->
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<!-- <minimizeJar>true</minimizeJar> -->
+							<transformers>
+								<!-- add Main-Class to manifest file -->
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>in.drozd.pdp.cil.kdhost.app.KDHostMain</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.0</version>
+			</plugin>
+			<!-- https://github.com/oracle/graal/tree/master/substratevm/src/native-image-maven-plugin 
+				https://github.com/remkop/picocli/tree/master/picocli-codegen -->
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.0</version>
+					<configuration>
+						<compilerArgs>
+							<arg>-Xlint</arg>
+						</compilerArgs>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+
+	<dependencies>
+		<dependency>
+			<!-- For command line parameter/options parsing -->
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>3.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>sanchez.jdbc</groupId>
+			<artifactId>scjdbc</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>bintray-kdrozd-maven-public</id>
+			<name>bintray</name>
+			<url>https://dl.bintray.com/kdrozd/maven-public</url>
+		</repository>
+	</repositories>
+</project>
