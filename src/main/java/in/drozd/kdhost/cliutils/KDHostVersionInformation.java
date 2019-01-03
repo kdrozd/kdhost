@@ -1,4 +1,4 @@
-package in.drozd.kdhost;
+package in.drozd.kdhost.cliutils;
 
 import java.io.IOException;
 import java.util.Properties;

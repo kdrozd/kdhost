@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
+import in.drozd.kdhost.cliutils.KDHostVersionInformation;
+
 class KDHostVersionInformationTest {
 
 	@Test
