@@ -110,11 +110,14 @@ public class KDHostMain implements Runnable {
 
 		// Offline actions
 		if (listListableTypes) {
+			KDElementTypes.stream().filter(et -> et.isListable()).sorted().forEach(System.out::println);
 			return;
 		}
 		if (listAllTypes) {
+			KDElementTypes.stream().sorted().forEach(System.out::println);
 			return;
 		}
+		
 
 		// This actions will use host connection
 
