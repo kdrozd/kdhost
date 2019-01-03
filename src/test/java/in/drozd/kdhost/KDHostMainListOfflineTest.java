@@ -1,17 +1,17 @@
 package in.drozd.kdhost;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Tag("offline")
 class KDHostMainListOfflineTest {
 
+	private KDHostMain kdhost = new KDHostMain();
+
 	@Test
 	@Tag("offline")
 	void testListSupported() {
-		KDHostMain.main(new String[] { "list", "-s" });
+		kdhost.list(false, true, false, false, null, null);
 	}
 
 	@Test
