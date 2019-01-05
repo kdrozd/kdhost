@@ -1,4 +1,4 @@
-package in.drozd.kdhost;
+package in.drozd.kdhost.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

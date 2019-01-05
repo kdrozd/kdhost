@@ -1,4 +1,4 @@
-package in.drozd.kdhost;
+package in.drozd.kdhost.exceptions;
 
 import java.sql.SQLException;
 

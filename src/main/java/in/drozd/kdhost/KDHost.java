@@ -13,6 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import in.drozd.kdhost.exceptions.KDHostSqlException;
+import in.drozd.kdhost.exceptions.KDHostUnableToConnectException;
+
 public class KDHost implements AutoCloseable {
 	protected final Logger log;
 

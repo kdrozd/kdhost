@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import in.drozd.kdhost.exceptions.KDHostSqlException;
 import in.drozd.kdhost.utils.KDFileUtils;
 
 public class KDHostElement {
