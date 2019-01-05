@@ -54,7 +54,7 @@ public class KDHostElement {
 			try {
 				parts[i] = rs.getString(i + 1);
 			} catch (SQLException e) {
-				e.printStackTrace();
+				throw new KDHostSqlException(e);
 			}
 		}
 		if (type == KDElementTypes.FKEY) {

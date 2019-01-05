@@ -839,6 +839,6 @@ public enum KDElementTypes {
 	}
 
 	public static KDElementTypes typeForFileName(String fileName) {
-		return KDElementTypes.typeForExtension(KDFileUtils.getExtension(fileName).get());
+		return KDElementTypes.typeForExtension(KDFileUtils.getExtension(fileName).orElse(""));
 	}
 }
