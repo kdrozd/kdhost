@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import in.drozd.kdhost.exceptions.KDHostSqlException;
 import in.drozd.kdhost.utils.KDFileUtils;
+import in.drozd.kdhost.utils.KDStringUtils;
 
 public class KDHostElement {
 
@@ -46,12 +47,10 @@ public class KDHostElement {
 	}
 
 	private String getFileName(ResultSet rs, KDElementTypes type) {
-		final String tableName = type.getTableForQuery();
-		final String[] columns = type.getQueryColumns().split(",");
+		final int columnsCount = (int) KDStringUtils.countChar(type.getQueryColumns(), ',') + 1;
+		final String[] parts = new String[columnsCount];
 
-		String[] parts = new String[columns.length];
-
-		for (int i = 0; i < parts.length; i++) {
+		for (int i = 0; i < columnsCount; i++) {
 			try {
 				parts[i] = rs.getString(i + 1);
 			} catch (SQLException e) {
@@ -63,7 +62,7 @@ public class KDHostElement {
 			parts[1] = parts[1].replace('%', '_');
 
 		}
-		if (parts[parts.length - 1].endsWith("." + type.fileExtension()))
+		if (parts[columnsCount - 1].endsWith("." + type.fileExtension()))
 			return String.join("-", parts);
 		return String.join("-", parts) + "." + type.fileExtension();
 	}
