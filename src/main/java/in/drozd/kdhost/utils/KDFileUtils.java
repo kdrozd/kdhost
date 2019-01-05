@@ -1,10 +1,13 @@
 package in.drozd.kdhost.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
 import in.drozd.kdhost.KDElementTypes;
+import in.drozd.kdhost.exceptions.KDHostIOException;
 
 public class KDFileUtils {
 
@@ -43,5 +46,15 @@ public class KDFileUtils {
 	public static Optional<String> getExtension(Path fileName) {
 
 		return getExtension(fileName.toFile());
+	}
+
+	public static void createDirectoryIfNotExists(Path defaultDirectory) {
+		if (!defaultDirectory.toFile().exists()) {
+			try {
+				Files.createDirectories(defaultDirectory);
+			} catch (IOException e) {
+				throw new KDHostIOException(e);
+			}
+		}
 	}
 }

@@ -92,6 +92,7 @@ public class KDHostMain implements Runnable {
 	@Command(description = "Get elements from host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
 	void get(@Option(names = "-f", description = "Override file if it exist. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean force,
 			@Parameters(paramLabel = "ELEMENT", index = "0..*", arity = "1..*", description = "Element(s) to get from host") String[] elements) throws Exception {
+		startingCommand(() -> "Get command");
 
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
@@ -102,6 +103,7 @@ public class KDHostMain implements Runnable {
 				host.getElement(new KDHostElement(el));
 			}
 		}
+		exitingCommand(() -> "Get command");
 
 	}
 
