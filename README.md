@@ -2,7 +2,7 @@
 
 ## Change log
 
-* 1.5.0
+* 1.5.0 [![Build Status](https://travis-ci.org/kdrozd/kdhost.svg?branch=master)](https://travis-ci.org/kdrozd/kdhost)
 	* Updates on documentation
 	* Updates in some commands
 
