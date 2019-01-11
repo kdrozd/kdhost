@@ -10,6 +10,9 @@ import in.drozd.kdhost.KDElementTypes;
 import in.drozd.kdhost.exceptions.KDHostIOException;
 
 public class KDFileUtils {
+	private KDFileUtils() {
+
+	}
 
 	public static String getElementName(Path file) {
 		return KDFileUtils.getElementName(file.getFileName().toString());
@@ -30,7 +33,8 @@ public class KDFileUtils {
 		if (fileName == null || (len = fileName.length()) == 0 || (ch = fileName.charAt(len - 1)) == '/' || ch == '\\' || // in the case of a directory
 				ch == '.') // in the case of . or ..
 			return Optional.empty();
-		int dotInd = fileName.lastIndexOf('.'), sepInd = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+		final int dotInd = fileName.lastIndexOf('.');
+		final int sepInd = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
 		if (dotInd <= sepInd)
 			return Optional.empty();
 		else
@@ -38,14 +42,11 @@ public class KDFileUtils {
 	}
 
 	public static Optional<String> getExtension(File fileName) {
-		if (fileName.isDirectory())
-			return Optional.empty();
 		return getExtension(fileName.toString());
 	}
 
 	public static Optional<String> getExtension(Path fileName) {
-
-		return getExtension(fileName.toFile());
+		return getExtension(fileName.toString());
 	}
 
 	public static void createDirectoryIfNotExists(Path defaultDirectory) {

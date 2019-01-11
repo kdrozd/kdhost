@@ -46,6 +46,11 @@ public enum KDElementTypes {
 		protected String getTableForQuery() {
 			return "DBTBL25";
 		}
+
+		@Override
+		public boolean canCompile() {
+			return true;
+		}
 	},
 	TABLE {
 		@Override
@@ -81,6 +86,11 @@ public enum KDElementTypes {
 		@Override
 		protected String getTableForQuery() {
 			return "DBTBL1";
+		}
+
+		@Override
+		public boolean canCompile() {
+			return true;
 		}
 	},
 	COLUMN {
@@ -122,6 +132,11 @@ public enum KDElementTypes {
 		@Override
 		protected String getTableForQuery() {
 			return "DBTBL1D";
+		}
+
+		@Override
+		public boolean canCompile() {
+			return true;
 		}
 	},
 	PROPERTY {
@@ -170,6 +185,11 @@ public enum KDElementTypes {
 		@Override
 		protected String getTableForQuery() {
 			return TABLE.getTableForQuery();
+		}
+
+		@Override
+		public boolean canCompile() {
+			return true;
 		}
 	},
 	PSLXTRA {
@@ -273,6 +293,11 @@ public enum KDElementTypes {
 			return "DBTBL5D";
 		}
 
+		@Override
+		public boolean canCompile() {
+			return true;
+		}
+
 	},
 	PREPOSTLIB {
 		@Override
@@ -364,6 +389,11 @@ public enum KDElementTypes {
 		@Override
 		protected String getQueryColumns() {
 			return "SID";
+		}
+
+		@Override
+		public boolean canCompile() {
+			return true;
 		}
 
 	},
@@ -458,6 +488,10 @@ public enum KDElementTypes {
 			return "BCHID";
 		}
 
+		@Override
+		public boolean canCompile() {
+			return true;
+		}
 	},
 	PSL {
 		@Override
@@ -469,8 +503,12 @@ public enum KDElementTypes {
 		public Path getDefaultDirectory() {
 			return Path.of("psl", "custom");
 		}
-		// FIXME: Add package support
 
+		// FIXME: Add package support
+		@Override
+		public boolean canCompile() {
+			return true;
+		}
 	},
 	TRIGGER {
 		@Override
@@ -501,6 +539,11 @@ public enum KDElementTypes {
 		@Override
 		protected String getTableForQuery() {
 			return "DBTBL7";
+		}
+
+		@Override
+		public boolean canCompile() {
+			return true;
 		}
 	},
 	INDEX {
@@ -533,6 +576,11 @@ public enum KDElementTypes {
 		protected String getTableForQuery() {
 			return "DBTBL8";
 		}
+
+		@Override
+		public boolean canCompile() {
+			return true;
+		}
 	},
 	JOURNAL {
 		@Override
@@ -563,6 +611,11 @@ public enum KDElementTypes {
 		@Override
 		protected String getTableForQuery() {
 			return "DBTBL9";
+		}
+
+		@Override
+		public boolean canCompile() {
+			return true;
 		}
 	},
 	SFILES {
@@ -604,6 +657,10 @@ public enum KDElementTypes {
 	}
 
 	public boolean isListable() {
+		return false;
+	}
+
+	public boolean canCompile() {
 		return false;
 	}
 

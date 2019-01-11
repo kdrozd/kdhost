@@ -9,4 +9,9 @@ public class KDHostSqlException extends RuntimeException {
 		super(e);
 	}
 
+	public KDHostSqlException(String e) {
+		super(e);
+
+	}
+
 }

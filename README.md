@@ -1,9 +1,11 @@
 # KDHost
 
-## Application plan
-This document is a roadmap/plan of functions this app will perform.
+## Change log
 
-## Application functions:
+* 1.5.0
+	* Updates on documentation
+	* Updates in some commands
+
 CLI application to communicate with host.
 
 Global parameters:
@@ -31,17 +33,17 @@ p761env get MRPC029.PROC
 
 Requirements:
 
-* Java (JRE) 11+
+* Java (JRE) 1.8+
 * Network connection to host (PIPv0.2+), but P7.5+ is recomended.
 
 ## Compatiblity
 
 |Host version|compile|drop |fwkinfo|get  |install|list |mrpc |send |sql  |refresh |test |tsc  |watch | 
 |:----------:|:-----:|:---:|:-----:|:---:|:-----:|:---:|:---:|:---:|:---:|:------:|:---:|:---:|:----:|
-|PIP v0.2    | ❌    | ❌  | ❌    | ✔    | ❌   | ❌ | ⁉️  | ✔   | ✔  | ✔      | ❌   | ❌  | ❌  |
-|P7.5.3      | ✔     | ❌  | ✔     | ✔ 💪 | ❌   | ✔   |  ✔  |✔    |✔   |✔       |✔     |✔    | ✔   |
-|P7.6.1      | ✔ ️   | ✔   | ✔     | ✔ 💪 | ✔    | ✔   | ✔   |✔    |✔   |✔       |✔     |✔    |✔    |
-|P7.6.2      | ✔ ️   | ✔ ️ | ✔     | ✔ 💪 | ✔    | ✔   | ✔   |✔    |✔   |✔       |✔     |✔    |✔    |
+|PIP v0.2    | ❌    | ❌  | ❌     | ✔   | ❌   |  ❌    | ⁉️   | ✔   | ✔  | ✔      | ❌   | ❌  | ❌   |
+|P7.5.3      | ✔     | ❌  | ✔     | ✔ 💪 | ❌   | ✔    |  ✔    |✔     |✔    |✔       |✔   |✔   | ✔   |
+|P7.6.1      | ✔ ️    | ✔   | ✔     | ✔ 💪 | ✔    | ✔    | ✔    |✔    |✔   |✔        |✔   |✔   |✔   |
+|P7.6.2      | ✔ ️    | ✔ ️  | ✔     | ✔ 💪 | ✔    | ✔    | ✔    |✔    |✔   |✔        |✔   |✔   |✔   |
 
 * ✔️ - supported
 * ⁉️ - not all options are supported, check command section for details.

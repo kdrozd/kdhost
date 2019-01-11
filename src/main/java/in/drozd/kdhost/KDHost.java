@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,8 @@ import in.drozd.kdhost.exceptions.KDHostUnsupportedOperation;
 import in.drozd.kdhost.utils.KDFileUtils;
 
 public class KDHost implements AutoCloseable {
+	private static final String CRLF = "\r\n";
+
 	protected final Logger log;
 
 	// For now they look similar but this one will support much more options later
@@ -35,6 +38,8 @@ public class KDHost implements AutoCloseable {
 	private static final String	FISGLOBAL_URL	= String.format("protocol=jdbc:fisglobal/database=%s:SCA$IBS", System.getProperty("KDHOST_HOST", "127.0.0.1:19200"));
 
 	private static final String EMPTY = "";
+
+	private static final String SUCCESS = "Success";
 
 	protected Connection	conn;
 	private boolean			overwriteFiles	= false;
@@ -132,8 +137,8 @@ public class KDHost implements AutoCloseable {
 				return Optional.empty();
 			}
 			// It was fine. 1 _ CRLF _ token CRLF file name
-			log.log(Level.FINER, () -> String.format("RETURN %s", Arrays.deepToString(response.split("\r\n"))));
-			return mrpcResponse.map(resp -> resp.split("\r\n")[1]);
+			log.log(Level.FINER, () -> String.format("RETURN %s", Arrays.deepToString(response.split(KDHost.CRLF))));
+			return mrpcResponse.map(resp -> resp.split(KDHost.CRLF)[1]);
 		}
 
 		// Nothing to return
@@ -179,6 +184,7 @@ public class KDHost implements AutoCloseable {
 		}
 	}
 
+	// TODO: Refactor initCode to return Optional of String
 	private String initCode(byte[] fileContent) {
 
 		// number of chunks has performance impact
@@ -288,23 +294,141 @@ public class KDHost implements AutoCloseable {
 		return "Drop sucessful";
 	}
 
-	public void sendElement(KDHostElement kdHostElement, boolean completeTable) {
-		// TODO Auto-generated method stub
+	public void sendElement(KDHostElement el, boolean completeTable) {
+
+		// send to host in loop
+		String token = initCode(el.getFilePath());
+
+		final String info = checkObj(el.getFileName(), token);
+		if (!info.startsWith("1")) {
+			log.severe(info);
+			throw new KDHostException("Unable to save file on host: ");
+
+		} else {
+			log.log(Level.INFO, () -> String.format("%s", info.substring(3)));
+		}
+		// change name of temporary file to original and load
+		String retVal = saveObj(el.getFileName(), token);
+		if (!retVal.startsWith("1"))
+			throw new KDHostException("Unable to save file on host");
+	}
+
+	public void compileElement(KDHostElement el) {
+		if (el.getElementType().canCompile()) {
+			log.info("Starting compilation of: " + el.getElementName());
+			String cmpResult;
+			if (!KDElementTypes.BATCH.equals(el.getElementType())) {
+				final String cmpTok = preCompileCheck(el.getFileName());
+				if (cmpTok.startsWith("0"))
+					throw new KDHostException(cmpTok.substring(2));
+				else
+					log.log(Level.FINEST, "Compilation token/information: {0}", cmpTok);
+				cmpResult = this.cmpLink(cmpTok);
+				log.log(Level.INFO, "Compilation result: {0}", cmpResult.substring(2));
+			} else {
+				// Custom support for batches
+				mrpc081("DBTBL33", el.getElementName()).ifPresent(result -> log.exiting("KDHost", "mrpc081", result.isEmpty() ? KDHost.SUCCESS : result));
+
+			}
+		} else {
+			log.warning("Element can't be compiled");
+		}
+	}
+
+	private Optional<String> mrpc081(String table, String element) {
+
+		try (CallableStatement cstatmt1 = conn.prepareCall("{call mrpc(81,?,?,?)}")) {
+			cstatmt1.setString(1, table); // REQUEST
+			cstatmt1.setString(2, element); // CODE
+
+			cstatmt1.registerOutParameter(3, Types.VARCHAR, "CODE");
+			try (ResultSet rs1 = cstatmt1.executeQuery()) {
+				if (!rs1.next()) {
+					return Optional.of(KDHost.SUCCESS);
+				} else {
+					throw new KDHostSqlException(String.format("Unable to compile %s", rs1.getString("CODE")));
+				}
+			}
+		} catch (SQLException e) {
+			throw new KDHostSqlException(e);
+		}
+	}
+
+	public String dropElement(KDHostElement element) {
+		log.info(() -> String.format("Droping: %s", element));
+
+		String result = mrpc121(KDMRPC121Requests.DROPOBJ, EMPTY, EMPTY, element.getFileName(), EMPTY, EMPTY, EMPTY, System.getProperty("user.name", "unkown user"))
+				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.DROPOBJ)));
+
+		if (!"1".equals(result)) {
+			return result.substring(2);
+		}
+		return "Drop sucessful";
+	}
+
+	public String testElement(KDHostElement el) {
+		logInfo(() -> "Test compile ");
+
+		if (el.getElementType().canCompile()) {
+			log.info("Test compile of: " + el.getFileName());
+			final String cmpTok = initCode(el.getFilePath());
+			final String testCompileResult = this.execComp(el.getFileName(), cmpTok);
+			if (!testCompileResult.contains("%PSL-I-LIST: 0 errors, 0 warnings, 0 informational messages")) {
+				throw new KDHostException(testCompileResult);
+			}
+			log.info(testCompileResult);
+			return testCompileResult;
+		} else {
+			throw new KDHostException("This element type is not supporting test compile");
+		}
+	}
+
+	private String execComp(String fileName, String cmpTok) {
+		return mrpc121(KDMRPC121Requests.EXECCOMP, EMPTY, cmpTok, fileName, EMPTY, EMPTY, EMPTY, EMPTY)
+				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.EXECCOMP)));
 
 	}
 
-	public void compileElement(KDHostElement kdHostElement) {
-		// TODO Auto-generated method stub
+	public void callMrpc(String mrpcid, String mrpcVersion, String[] mrpcParameters) {
+		/*
+		 * Make generic call to any MRPC and display results/error.
+		 * 
+		 * There is still some work missing to make this code clean... in next version
+		 * :)
+		 */
+		log.entering(KDHost.class.getName(), "callMrpc", new Object[] { mrpcid, mrpcVersion, Arrays.deepToString(mrpcParameters) });
 
-	}
+		String response = "";
+		String errors = "";
+		int numberOfParameters = mrpcParameters.length + 1; // +1 is for response parameter
+		final String mrpcCallString = "{call mrpc(" + mrpcid + String.join("", Collections.nCopies(numberOfParameters, ",?")) + ")}";
 
-	public void dropElement(KDHostElement kdHostElement) {
-		// TODO Auto-generated method stub
+		try (CallableStatement cs = conn.prepareCall(mrpcCallString);) {
 
-	}
+			for (int i = 1; i < numberOfParameters; i++) {
+				cs.setString(i, mrpcParameters[i - 1]);
+			}
+			cs.registerOutParameter(numberOfParameters, Types.VARCHAR, "KDRPCXRESPONSE");
+			try (ResultSet rs1 = cs.executeQuery()) {
+				while (rs1.next()) {
+					response = rs1.getString("KDRPCXRESPONSE");
+				}
+			}
+		} catch (SQLException e) {
+			response = "";
+			log.severe(e.getMessage());
+			errors = e.getMessage();
+		} finally {
+			// FIXME: Move this out, and return touple with response in client class
 
-	public void testElement(KDHostElement kdHostElement) {
-		// TODO Auto-generated method stub
+			// This is output not logs
+			System.out.println("RESPONSE: " + response);
+			if (!errors.isEmpty()) {
+				// This is output not logs
+				System.err.println("ERROR   " + errors);
+			}
+		}
+		log.exiting(KDHost.class.getName(), "callMrpc");
 
 	}
 

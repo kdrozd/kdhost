@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>in.drozd.kdhost</groupId>
 	<artifactId>kdhost</artifactId>
-	<version>1.2.1-SNAPSHOT</version>
+	<version>1.5.0-SNAPSHOT</version>
 	<name>KDHost - CLI Host Client</name>
 
 	<properties>
@@ -14,7 +14,7 @@
 		<java.version>11</java.version>
 		<junit.version>5.3.1</junit.version>
 		<sanchezjdbc.version>3.0.1</sanchezjdbc.version>
-		<picocli.version>3.8.2</picocli.version>
+		<picocli.version>3.9.1</picocli.version>
 	</properties>
 	<build>
 		<resources>
@@ -117,7 +117,11 @@
 			<scope>test</scope>
 		</dependency>
 
-
+		<dependency>
+			<groupId>com.neva.commons</groupId>
+			<artifactId>gitignore-file-filter</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
@@ -127,6 +131,14 @@
 			<id>bintray-kdrozd-maven-public</id>
 			<name>bintray</name>
 			<url>https://dl.bintray.com/kdrozd/maven-public</url>
+		</repository>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>bintray-neva-dev-maven-public</id>
+			<name>bintray</name>
+			<url>https://dl.bintray.com/neva-dev/maven-public</url>
 		</repository>
 	</repositories>
 </project>
