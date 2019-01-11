@@ -1,3 +1,9 @@
 language: java
 jdk:
     - oraclejdk11
+
+deploy:
+  provider: releases
+  file: target/kdhost.jar
+  skip_cleanup: true
+  draft: true

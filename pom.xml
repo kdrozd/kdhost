@@ -17,6 +17,7 @@
 		<picocli.version>3.9.1</picocli.version>
 	</properties>
 	<build>
+		<finalName>${artifactId}</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
