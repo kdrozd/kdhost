@@ -75,7 +75,7 @@ public class KDHost implements AutoCloseable {
 
 			} catch (Exception e1) {
 				logError(() -> e1.getMessage());
-				throw new KDHostUnableToConnectException(e.getMessage());
+				throw new KDHostUnableToConnectException(e1.getMessage());
 			}
 		}
 
