@@ -17,7 +17,7 @@
 		<picocli.version>3.9.1</picocli.version>
 	</properties>
 	<build>
-		<finalName>${artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -37,6 +37,15 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<filters>
+								<filter>
+	<!-- Force to include opensource driver -->
+									<artifact>sanchez.jdbc:scjdbc</artifact>
+									<includes>
+										<include>sanchez/**</include>
+									</includes>
+								</filter>
+							</filters>
 							<minimizeJar>true</minimizeJar>
 							<transformers>
 								<!-- add Main-Class to manifest file -->
