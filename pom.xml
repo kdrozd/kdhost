@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>in.drozd.kdhost</groupId>
 	<artifactId>kdhost</artifactId>
-	<version>1.6.2</version>
+	<version>1.7.0</version>
 	<name>KDHost - CLI Host Client</name>
 
 	<properties>
@@ -12,9 +12,9 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
-		<junit.version>5.3.1</junit.version>
+		<junit.version>5.4.0</junit.version>
 		<sanchezjdbc.version>3.0.1</sanchezjdbc.version>
-		<picocli.version>3.9.1</picocli.version>
+		<picocli.version>3.9.5</picocli.version>
 	</properties>
 	<build>
 		<finalName>${project.artifactId}</finalName>
@@ -39,7 +39,7 @@
 						<configuration>
 							<filters>
 								<filter>
-	<!-- Force to include opensource driver -->
+									<!-- Force to include opensource driver -->
 									<artifact>sanchez.jdbc:scjdbc</artifact>
 									<includes>
 										<include>sanchez/**</include>
@@ -132,6 +132,12 @@
 			<groupId>com.neva.commons</groupId>
 			<artifactId>gitignore-file-filter</artifactId>
 			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.jodah</groupId>
+			<artifactId>failsafe</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 	</dependencies>
 	<repositories>

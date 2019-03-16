@@ -70,11 +70,20 @@ public enum KDElementTypes {
 
 		@Override
 		public Path getDefaultDirectory(String elementName) {
+			String[] names = elementName.split("-");
+			if (names != null && names[0] != null && names.length > 1) {
+				return Path.of("dataqwik", "table", names[0].toLowerCase());
+
+			}
 			return Path.of("dataqwik", "table", KDFileUtils.getElementName(elementName).toLowerCase());
 		}
 
 		@Override
 		public Path getDefaultDirectory(KDHostElement element) {
+			String[] names = element.getElementName().split("-");
+			if (names != null && names[0] != null && names.length > 1) {
+				return Path.of("dataqwik", "table", names[0].toLowerCase());
+			}
 			return Path.of("dataqwik", "table", element.getElementName().toLowerCase());
 		}
 
@@ -763,7 +772,8 @@ public enum KDElementTypes {
 		if (!this.isListable())
 			return null;
 
-		return String.format("SELECT DISTINCT %s FROM %s WHERE %s='%s' ", this.getQueryColumns(), this.getTableForQuery(), this.getTableNameField(), tableName);
+		return String.format("SELECT DISTINCT %s FROM %s WHERE %s='%s' ", this.getQueryColumns(),
+				this.getTableForQuery(), this.getTableNameField(), tableName);
 	}
 
 	protected String getTableNameField() {

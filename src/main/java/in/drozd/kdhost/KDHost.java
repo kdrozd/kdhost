@@ -34,8 +34,10 @@ public class KDHost implements AutoCloseable {
 	protected final Logger log;
 
 	// For now they look similar but this one will support much more options later
-	private static final String	SANCHEZ_URL		= String.format("protocol=jdbc:sanchez/database=%s:SCA$IBS", System.getProperty("KDHOST_HOST", "127.0.0.1:19200"));
-	private static final String	FISGLOBAL_URL	= String.format("protocol=jdbc:fisglobal/database=%s:SCA$IBS", System.getProperty("KDHOST_HOST", "127.0.0.1:19200"));
+	private static final String	SANCHEZ_URL		= String.format("protocol=jdbc:sanchez/database=%s:SCA$IBS",
+			System.getProperty("KDHOST_HOST", "127.0.0.1:49200"));
+	private static final String	FISGLOBAL_URL	= String.format("protocol=jdbc:fisglobal/database=%s:SCA$IBS",
+			System.getProperty("KDHOST_HOST", "127.0.0.1:49200"));
 
 	private static final String EMPTY = "";
 
@@ -64,14 +66,16 @@ public class KDHost implements AutoCloseable {
 			Class.forName("fisglobal.jdbc.driver.ScDriver").getDeclaredConstructor().newInstance();
 			log.log(Level.CONFIG, "Connection string: {0}", FISGLOBAL_URL);
 
-			conn = DriverManager.getConnection(FISGLOBAL_URL, System.getProperty("KDHOST_USER", "1"), System.getProperty("KDHOST_PASS", "xxx"));
+			conn = DriverManager.getConnection(FISGLOBAL_URL, System.getProperty("KDHOST_USER", "1"),
+					System.getProperty("KDHOST_PASS", "xxx"));
 		} catch (Exception e) {
 			try {
 				log.fine("Using fallback driver");
 				Class.forName("sanchez.jdbc.driver.ScDriver").getDeclaredConstructor().newInstance();
 				log.log(Level.CONFIG, "Connection string: {0}", SANCHEZ_URL);
 
-				conn = DriverManager.getConnection(SANCHEZ_URL, System.getProperty("KDHOST_USER", "1"), System.getProperty("KDHOST_PASS", "xxx"));
+				conn = DriverManager.getConnection(SANCHEZ_URL, System.getProperty("KDHOST_USER", "1"),
+						System.getProperty("KDHOST_PASS", "xxx"));
 
 			} catch (Exception e1) {
 				logError(() -> e1.getMessage());
@@ -80,7 +84,8 @@ public class KDHost implements AutoCloseable {
 		}
 
 		try {
-			log.log(Level.CONFIG, "Driver version: {0} {1}", new String[] { conn.getMetaData().getDriverName(), conn.getMetaData().getDriverVersion() });
+			log.log(Level.CONFIG, "Driver version: {0} {1}",
+					new String[] { conn.getMetaData().getDriverName(), conn.getMetaData().getDriverVersion() });
 		} catch (SQLException e) {
 			throw new KDHostSqlException(e);
 		}
@@ -120,7 +125,8 @@ public class KDHost implements AutoCloseable {
 
 	private Optional<String> initObj(KDHostElement objid) {
 
-		final Optional<String> mrpcResponse = mrpc121(KDMRPC121Requests.INITOBJ, EMPTY, EMPTY, EMPTY, objid.getElementType().typeDescription(), objid.getFileName(), EMPTY, EMPTY);
+		final Optional<String> mrpcResponse = mrpc121(KDMRPC121Requests.INITOBJ, EMPTY, EMPTY, EMPTY,
+				objid.getElementType().typeDescription(), objid.getElementName(), EMPTY, EMPTY);
 
 		if (mrpcResponse.isPresent()) {
 			final String response = mrpcResponse.get();
@@ -146,8 +152,10 @@ public class KDHost implements AutoCloseable {
 
 	}
 
-	private Optional<String> mrpc121(KDMRPC121Requests request, String code, String cmpTok, String lockFile, String objType, String objid, String token, String user) {
-		log.entering("KDhost", "mrpc121", new String[] { request.name(), code, cmpTok, lockFile, objType, objid, token, user });
+	private Optional<String> mrpc121(KDMRPC121Requests request, String code, String cmpTok, String lockFile,
+			String objType, String objid, String token, String user) {
+		log.entering("KDhost", "mrpc121",
+				new String[] { request.name(), code, cmpTok, lockFile, objType, objid, token, user });
 
 		try (CallableStatement cstatmt1 = conn.prepareCall("{call mrpc(121,?,?,?,?,?,?,?,?,?)}");) {
 			cstatmt1.setString(1, request.name()); // REQUEST
@@ -198,7 +206,8 @@ public class KDHost implements AutoCloseable {
 				sb.append("|");
 			}
 			token = mrpc121(KDMRPC121Requests.INITCODE, sb.toString(), token, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
-					.orElseThrow(() -> new KDHostException(String.format("Empty token returned for %s", KDMRPC121Requests.INITCODE)));
+					.orElseThrow(() -> new KDHostException(
+							String.format("Empty token returned for %s", KDMRPC121Requests.INITCODE)));
 		}
 
 		return token;
@@ -227,53 +236,59 @@ public class KDHost implements AutoCloseable {
 	}
 
 	private String saveObj(String type, String token) {
-		return mrpc121(KDMRPC121Requests.SAVEOBJ, EMPTY, EMPTY, type, EMPTY, EMPTY, token, System.getProperty("user.name", "unkown user"))
-				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.SAVEOBJ)));
+		return mrpc121(KDMRPC121Requests.SAVEOBJ, EMPTY, EMPTY, type, EMPTY, EMPTY, token,
+				System.getProperty("user.name", "unkown user"))
+						.orElseThrow(() -> new KDHostException(
+								String.format("Empty response returned for %s", KDMRPC121Requests.SAVEOBJ)));
 
 	}
 
 	private String checkObj(String fileName, String token) {
-		return mrpc121(KDMRPC121Requests.CHECKOBJ, EMPTY, EMPTY, fileName, EMPTY, EMPTY, token, EMPTY)
-				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.CHECKOBJ)));
+		return mrpc121(KDMRPC121Requests.CHECKOBJ, EMPTY, EMPTY, fileName, EMPTY, EMPTY, token, EMPTY).orElseThrow(
+				() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.CHECKOBJ)));
 	}
 
 	/*
 	 * Returns list of PSL build in classes
 	 */
 	public String[] getPslCls() {
-		return mrpc121(KDMRPC121Requests.GETPSLCLS, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY).orElseGet(() -> EMPTY).split(",");
+		return mrpc121(KDMRPC121Requests.GETPSLCLS, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
+				.orElseGet(() -> EMPTY).split(",");
 	}
 
 	/*
 	 * Returns list of MUMPS functions supported by PSL, currently only $select
 	 */
 	public String[] getPslFw() {
-		return mrpc121(KDMRPC121Requests.GETPSLFW, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY).orElseGet(() -> EMPTY).split(",");
+		return mrpc121(KDMRPC121Requests.GETPSLFW, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
+				.orElseGet(() -> EMPTY).split(",");
 	}
 
 	/*
 	 * Returns list of PSL keywords and compiler directoves
 	 */
 	public String[] getPslKw() {
-		return mrpc121(KDMRPC121Requests.GETPSLKW, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY).orElseGet(() -> EMPTY).split(",");
+		return mrpc121(KDMRPC121Requests.GETPSLKW, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
+				.orElseGet(() -> EMPTY).split(",");
 	}
 
 	/*
 	 * Returns JSON like list of supported features
 	 */
 	public String[] getFwkFtrs() {
-		return mrpc121(KDMRPC121Requests.GETFWKFTRS, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY).orElseGet(() -> EMPTY).split(",");
+		return mrpc121(KDMRPC121Requests.GETFWKFTRS, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
+				.orElseGet(() -> EMPTY).split(",");
 	}
 
 	private String preCompileCheck(String elementName) {
-		return mrpc121(KDMRPC121Requests.PRECMP, EMPTY, EMPTY, elementName, EMPTY, EMPTY, EMPTY, EMPTY)
-				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.PRECMP)));
+		return mrpc121(KDMRPC121Requests.PRECMP, EMPTY, EMPTY, elementName, EMPTY, EMPTY, EMPTY, EMPTY).orElseThrow(
+				() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.PRECMP)));
 
 	}
 
 	private String cmpLink(String cmpTok) {
-		return mrpc121(KDMRPC121Requests.CMPLINK, EMPTY, cmpTok, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY)
-				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.CMPLINK)));
+		return mrpc121(KDMRPC121Requests.CMPLINK, EMPTY, cmpTok, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY).orElseThrow(
+				() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.CMPLINK)));
 
 	}
 
@@ -285,8 +300,10 @@ public class KDHost implements AutoCloseable {
 	public String drop(KDHostElement element) {
 		log.info(() -> String.format("Droping: %s", element));
 
-		String result = mrpc121(KDMRPC121Requests.DROPOBJ, "", "", element.getFileName(), EMPTY, EMPTY, EMPTY, System.getProperty("user.name", "unkown user"))
-				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.DROPOBJ)));
+		String result = mrpc121(KDMRPC121Requests.DROPOBJ, "", "", element.getFileName(), EMPTY, EMPTY, EMPTY,
+				System.getProperty("user.name", "unkown user"))
+						.orElseThrow(() -> new KDHostException(
+								String.format("Empty response returned for %s", KDMRPC121Requests.DROPOBJ)));
 
 		if (!"1".equals(result)) {
 			throw new KDHostException(result.substring(2));
@@ -327,7 +344,8 @@ public class KDHost implements AutoCloseable {
 				log.log(Level.INFO, "Compilation result: {0}", cmpResult.substring(2));
 			} else {
 				// Custom support for batches
-				mrpc081("DBTBL33", el.getElementName()).ifPresent(result -> log.exiting("KDHost", "mrpc081", result.isEmpty() ? KDHost.SUCCESS : result));
+				mrpc081("DBTBL33", el.getElementName()).ifPresent(
+						result -> log.exiting("KDHost", "mrpc081", result.isEmpty() ? KDHost.SUCCESS : result));
 
 			}
 		} else {
@@ -357,8 +375,10 @@ public class KDHost implements AutoCloseable {
 	public String dropElement(KDHostElement element) {
 		log.info(() -> String.format("Droping: %s", element));
 
-		String result = mrpc121(KDMRPC121Requests.DROPOBJ, EMPTY, EMPTY, element.getFileName(), EMPTY, EMPTY, EMPTY, System.getProperty("user.name", "unkown user"))
-				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.DROPOBJ)));
+		String result = mrpc121(KDMRPC121Requests.DROPOBJ, EMPTY, EMPTY, element.getFileName(), EMPTY, EMPTY, EMPTY,
+				System.getProperty("user.name", "unkown user"))
+						.orElseThrow(() -> new KDHostException(
+								String.format("Empty response returned for %s", KDMRPC121Requests.DROPOBJ)));
 
 		if (!"1".equals(result)) {
 			return result.substring(2);
@@ -384,8 +404,8 @@ public class KDHost implements AutoCloseable {
 	}
 
 	private String execComp(String fileName, String cmpTok) {
-		return mrpc121(KDMRPC121Requests.EXECCOMP, EMPTY, cmpTok, fileName, EMPTY, EMPTY, EMPTY, EMPTY)
-				.orElseThrow(() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.EXECCOMP)));
+		return mrpc121(KDMRPC121Requests.EXECCOMP, EMPTY, cmpTok, fileName, EMPTY, EMPTY, EMPTY, EMPTY).orElseThrow(
+				() -> new KDHostException(String.format("Empty response returned for %s", KDMRPC121Requests.EXECCOMP)));
 
 	}
 
@@ -396,12 +416,14 @@ public class KDHost implements AutoCloseable {
 		 * There is still some work missing to make this code clean... in next version
 		 * :)
 		 */
-		log.entering(KDHost.class.getName(), "callMrpc", new Object[] { mrpcid, mrpcVersion, Arrays.deepToString(mrpcParameters) });
+		log.entering(KDHost.class.getName(), "callMrpc",
+				new Object[] { mrpcid, mrpcVersion, Arrays.deepToString(mrpcParameters) });
 
 		String response = "";
 		String errors = "";
 		int numberOfParameters = mrpcParameters.length + 1; // +1 is for response parameter
-		final String mrpcCallString = "{call mrpc(" + mrpcid + String.join("", Collections.nCopies(numberOfParameters, ",?")) + ")}";
+		final String mrpcCallString = "{call mrpc(" + mrpcid
+				+ String.join("", Collections.nCopies(numberOfParameters, ",?")) + ")}";
 
 		try (CallableStatement cs = conn.prepareCall(mrpcCallString);) {
 
@@ -460,7 +482,9 @@ public class KDHost implements AutoCloseable {
 		if (!this.isValidTable(elementType.getTableForQuery()))
 			return elements;
 
-		final String qry = (table != null && !table.isBlank() && !elementType.getTableNameField().isBlank()) ? elementType.getQuery(table) : elementType.getQuery();
+		final String qry = (table != null && !table.isBlank() && !elementType.getTableNameField().isBlank())
+				? elementType.getQuery(table)
+				: elementType.getQuery();
 		if (!qry.isBlank()) {
 			try (Statement st = conn.createStatement()) {
 				try (ResultSet rs = st.executeQuery(qry)) {
