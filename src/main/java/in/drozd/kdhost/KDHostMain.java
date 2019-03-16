@@ -59,7 +59,8 @@ public class KDHostMain implements Runnable {
 
 	public static void main(String[] args) {
 		CommandLine cmd = new CommandLine(new KDHostMain());
-		cmd.parseWithHandlers(new CommandLine.RunAll().andExit(0), CommandLine.defaultExceptionHandler().andExit(1), args);
+		cmd.parseWithHandlers(new CommandLine.RunAll().andExit(0), CommandLine.defaultExceptionHandler().andExit(1),
+				args);
 	}
 
 	@Override
@@ -68,7 +69,8 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "Send element(s) to host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void send(@Option(names = { "-c" }, description = "For Tables send table definition with columns. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean completeTable,
+	void send(@Option(names = {
+			"-c" }, description = "For Tables send table definition with columns. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean completeTable,
 			@Parameters(paramLabel = "PATH") Path[] paths) throws Exception {
 
 		try (KDHost host = new KDHost(log)) {
@@ -81,7 +83,9 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "Compile elements on host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void compile(@Parameters(index = "0..*", description = "Files to compile", arity = "0..*", paramLabel = "ELEMENT") Path[] elements) throws Exception {
+	void compile(
+			@Parameters(index = "0..*", description = "Files to compile", arity = "0..*", paramLabel = "ELEMENT") Path[] elements)
+			throws Exception {
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
 			for (Path el : elements) {
@@ -94,7 +98,8 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "Drop elements from host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void drop(@Parameters(description = "elements to drop", paramLabel = "ELEMENT") String[] elements) throws Exception {
+	void drop(@Parameters(description = "elements to drop", paramLabel = "ELEMENT") String[] elements)
+			throws Exception {
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
 			for (String el : elements) {
@@ -105,21 +110,44 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(name = "extract", description = "Extract environment", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class, hidden = true)
-	void extractEnv(@Option(names = "-f", description = "Override file if it exist. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean force) throws Exception {
-		// TODO: Implement extract env command
-		this.getall(true, true, new String[] {});
+	void extractEnv(
+			@Option(names = "-f", description = "Override file if it exist. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean force)
+			throws Exception {
+		// Step 1 - Download listable elements
+		try (KDHost host = new KDHost(log)) {
+			host.connectToHost();
+			if (force) {
+				host.setForceOverRide(force);
+			}
+			KDElementTypes.stream().filter(et -> et.isListable()).flatMap(host::streamElementsOfType).parallel()
+					.forEach(host::getElement);
+		}
+
 	}
 
 	@Command(description = "Get all elements from host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class, hidden = true)
-	void getall(@Option(names = "-f", description = "Override file if it exist. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean force,
-			@Option(names = "-r", description = "Download filer/record elements. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean record,
-			@Parameters(paramLabel = "ELEMENT", index = "0..*", arity = "1..*", description = "Element(s) to get from host") String[] elements) {
-		// TODO: Implement getall command
+	void getall(
+			@Option(names = "-f", description = "Override file if it exist. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean force,
+			@Option(names = "-r", description = "Download filer/record elements. Default value: ${DEFAULT-VALUE}", defaultValue = "false", hidden = true) boolean record,
+			@Parameters(paramLabel = "ELEMENT", index = "0..*", arity = "1..*", description = "Element(s) to get from host") List<KDElementTypes> elements) {
+
+		try (KDHost host = new KDHost(log)) {
+			host.connectToHost();
+			if (force) {
+				host.setForceOverRide(force);
+			}
+			if (elements != null && !elements.isEmpty()) {
+				elements.stream().flatMap(host::streamElementsOfType).forEach(host::getElement);
+			}
+		}
+
 	}
 
 	@Command(description = "Get elements from host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void get(@Option(names = "-f", description = "Override file if it exist. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean force,
-			@Parameters(paramLabel = "ELEMENT", index = "0..*", arity = "1..*", description = "Element(s) to get from host") String[] elements) throws Exception {
+	void get(
+			@Option(names = "-f", description = "Override file if it exist. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean force,
+			@Parameters(paramLabel = "ELEMENT", index = "0..*", arity = "1..*", description = "Element(s) to get from host") String[] elements)
+			throws Exception {
 		startingCommand(() -> "Get command");
 
 		try (KDHost host = new KDHost(log)) {
@@ -141,7 +169,8 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "Execute mrpc code on host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void mrpc(@Option(names = { "--mv" }, paramLabel = "VERSION", defaultValue = "1", description = "MRPC version to use, default: ${DEFAULT-VALUE}", hidden = false) String mrpcVersion,
+	void mrpc(@Option(names = {
+			"--mv" }, paramLabel = "VERSION", defaultValue = "1", description = "MRPC version to use, default: ${DEFAULT-VALUE}", hidden = false) String mrpcVersion,
 			@Parameters(index = "0", arity = "1", description = "MRPC ID", paramLabel = "MRPC_ID") String mrpcid,
 			@Parameters(index = "1..*", arity = "0..*", description = "MRPC parameters", paramLabel = "PARAMETERS") String[] parameters) {
 		try (KDHost host = new KDHost(log)) {
@@ -153,7 +182,8 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "List elements from host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void list(@Option(names = "-a", description = "List all (supported) elements from host.", defaultValue = "false", hidden = true) boolean all,
+	void list(
+			@Option(names = "-a", description = "List all (supported) elements from host.", defaultValue = "false", hidden = true) boolean all,
 			@Option(names = "-l", description = "List listable element types", defaultValue = "false") boolean listListableTypes,
 			@Option(names = "-s", description = "List supported element types", defaultValue = "false") boolean listAllTypes,
 			@Option(names = "-n", description = "Show element names", defaultValue = "false") boolean asNames,
@@ -177,13 +207,18 @@ public class KDHostMain implements Runnable {
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
 			if (elementTypes != null && !elementTypes.isEmpty()) {
-				elementTypes.stream().flatMap(elType -> host.streamElementsOfType(elType, table)).forEach(el -> printElements(el, asNames));
+				elementTypes.stream().flatMap(elType -> host.streamElementsOfType(elType, table))
+						.forEach(el -> printElements(el, asNames));
 			} else {
 
 				if (all) {
-					KDElementTypes.stream().filter(et -> et.isListable()).flatMap(elType -> host.streamElementsOfType(elType)).forEach(el -> printElements(el, asNames));
+					KDElementTypes.stream().filter(et -> et.isListable())
+							.flatMap(elType -> host.streamElementsOfType(elType))
+							.forEach(el -> printElements(el, asNames));
 				} else if (!table.isBlank()) {
-					Stream.of(KDElementTypes.TABLE, KDElementTypes.COLUMN).flatMap(elType -> host.streamElementsOfType(elType, table)).forEach(el -> printElements(el, asNames));
+					Stream.of(KDElementTypes.TABLE, KDElementTypes.COLUMN)
+							.flatMap(elType -> host.streamElementsOfType(elType, table))
+							.forEach(el -> printElements(el, asNames));
 
 				}
 			}
@@ -195,12 +230,14 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "Refresh elements from host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class, hidden = true)
-	void refresh(@Parameters(index = "0..*", description = "Elements to refresh", arity = "1..*", paramLabel = "ELEMENT") Path[] elements) {
+	void refresh(
+			@Parameters(index = "0..*", description = "Elements to refresh", arity = "1..*", paramLabel = "ELEMENT") Path[] elements) {
 		// TODO: IMplement refresh command
 	}
 
 	@Command(description = "Execute sql code on host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void sql(@Option(names = "-s", description = "Character used to separate columns, default: ${DEFAULT-VALUE}", defaultValue = "|", paramLabel = "SEPARATOR") String separator,
+	void sql(
+			@Option(names = "-s", description = "Character used to separate columns, default: ${DEFAULT-VALUE}", defaultValue = "|", paramLabel = "SEPARATOR") String separator,
 			@Parameters(index = "0..*", description = "SQL query to execute", paramLabel = "SQL QUERY") String[] sqlQry) {
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
@@ -236,7 +273,9 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "Test compile elements on host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void test(@Parameters(index = "0..*", description = "Elements to refresh", arity = "1..*", paramLabel = "ELEMENT") Path[] elements) throws Exception {
+	void test(
+			@Parameters(index = "0..*", description = "Elements to refresh", arity = "1..*", paramLabel = "ELEMENT") Path[] elements)
+			throws Exception {
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
 			for (Path el : elements) {
@@ -247,7 +286,9 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "Test, Send, Compile elements on host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void tsc(@Parameters(index = "0..*", description = "Elements to refresh", arity = "1..*", paramLabel = "ELEMENT") Path[] elements) throws Exception {
+	void tsc(
+			@Parameters(index = "0..*", description = "Elements to refresh", arity = "1..*", paramLabel = "ELEMENT") Path[] elements)
+			throws Exception {
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
 			for (Path file : elements) {
@@ -277,7 +318,8 @@ public class KDHostMain implements Runnable {
 	}
 
 	@Command(description = "Watch for changes and execute tsc", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
-	void watch(@Parameters(index = "0..*", description = "Directory to watch", paramLabel = "PATH") Path folder) throws IOException {
+	void watch(@Parameters(index = "0..*", description = "Directory to watch", paramLabel = "PATH") Path folder)
+			throws IOException {
 		this.watcher = FileSystems.getDefault().newWatchService();
 		this.keys = new HashMap<>();
 
@@ -323,8 +365,10 @@ public class KDHostMain implements Runnable {
 								processNewFile(host, child);
 							}
 						} catch (IOException x) {
-							log.log(Level.SEVERE, () -> String.format("Unable to register watcher for: %s", folder.toAbsolutePath().normalize()));
-							throw new KDHostException(String.format("Unable to register watcher for: %s", folder.toAbsolutePath().normalize()));
+							log.log(Level.SEVERE, () -> String.format("Unable to register watcher for: %s",
+									folder.toAbsolutePath().normalize()));
+							throw new KDHostException(String.format("Unable to register watcher for: %s",
+									folder.toAbsolutePath().normalize()));
 						}
 					}
 					if (kind == StandardWatchEventKinds.ENTRY_MODIFY && child.toFile().exists()) {
@@ -359,7 +403,8 @@ public class KDHostMain implements Runnable {
 				}
 			}
 		} catch (IOException e) {
-			log.log(Level.SEVERE, () -> String.format("Unable to register watcher for: %s", folder.toAbsolutePath().normalize()));
+			log.log(Level.SEVERE,
+					() -> String.format("Unable to register watcher for: %s", folder.toAbsolutePath().normalize()));
 			throw new KDHostException(e);
 		}
 	}
@@ -408,7 +453,8 @@ public class KDHostMain implements Runnable {
 			log.log(Level.CONFIG, "{0} file excluded by gitignore", dir);
 			return;
 		}
-		WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
+		WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE,
+				StandardWatchEventKinds.ENTRY_MODIFY);
 		keys.put(key, dir);
 		log.log(Level.INFO, "Watching: {0}", dir);
 	}
@@ -469,7 +515,8 @@ public class KDHostMain implements Runnable {
 
 		this.logLevel = this.logLevel.toUpperCase();
 
-		if (Stream.of("INFO", "ALL", "FINE", "SEVERE", "CONFIG", "FINER", "FINEST").noneMatch(el -> this.logLevel.equals(el))) {
+		if (Stream.of("INFO", "ALL", "FINE", "SEVERE", "CONFIG", "FINER", "FINEST")
+				.noneMatch(el -> this.logLevel.equals(el))) {
 			this.logLevel = DEFAULT_LOG_LEVEL_STR;
 		}
 

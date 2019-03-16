@@ -2,9 +2,17 @@
 
 ## Change log
 
-* 1.5.0 [![Build Status](https://travis-ci.org/kdrozd/kdhost.svg?branch=master)](https://travis-ci.org/kdrozd/kdhost)
-	* Updates on documentation
-	* Updates in some commands
+    * 1.8.x [![Build Status](https://travis-ci.org/kdrozd/kdhost.svg?branch=master)](https://travis-ci.org/kdrozd/kdhost)
+      * Added `extract` command
+      * Added `getall` command
+      * Updated Picocli version to 3.9.5
+      * Updated JUnit 5.4
+    * 1.7.x 
+        * Updated Picocli version to 3.9.2
+        * Use of `net.jodah:failsafe`
+    * 1.5.x
+        * Updates on documentation
+        * Updates in some commands
 
 CLI application to communicate with host.
 
@@ -33,7 +41,7 @@ p761env get MRPC029.PROC
 
 Requirements:
 
-* Java (JRE) 1.8+
+* Java (JRE) 11+
 * Network connection to host (PIPv0.2+), but P7.5+ is recomended.
 
 ## Compatiblity
@@ -96,17 +104,19 @@ Available options:
 
 `kdhost get MRPC121.PROC && cat dataqwik/procedure/MRPC121.PROC`
 
-### getall
+#### getall
 
 Command will download all elements of specific type. TYou need to specify element type (types) you would like to download.
 
 Available options:
 
-* `--all` Will download all element types that can be listed. psl, pslx and DAT files are excluded. This option can be used to perform environment extract.
-* `-f, --filer=<filer>`      Get all elements belonging to table filer.
-* `-t, --table=<table>`       Get table, column definition for specific table.
 * `--force` Override file if it exist localy
-  
+
+#### extract
+
+This is special version of `getall` command. It will get all posible elements from host for all types. This is not possible
+for all elements.
+
 #### getall command example
 
 * `kdhost getall procedure` - will download all procedure files from host
