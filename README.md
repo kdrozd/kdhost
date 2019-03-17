@@ -2,17 +2,17 @@
 
 ## Change log
 
-    * 1.8.x [![Build Status](https://travis-ci.org/kdrozd/kdhost.svg?branch=master)](https://travis-ci.org/kdrozd/kdhost)
-      * Added `extract` command
-      * Added `getall` command
-      * Updated Picocli version to 3.9.5
-      * Updated JUnit 5.4
-    * 1.7.x 
-        * Updated Picocli version to 3.9.2
-        * Use of `net.jodah:failsafe`
-    * 1.5.x
-        * Updates on documentation
-        * Updates in some commands
+* 1.8.x [![Build Status](https://travis-ci.org/kdrozd/kdhost.svg?branch=master)](https://travis-ci.org/kdrozd/kdhost)
+    * Added `extract` command
+    * Added `getall` command
+    * Updated Picocli version to 3.9.5
+    * Updated JUnit 5.4
+* 1.7.x 
+    * Updated Picocli version to 3.9.2
+    * Use of `net.jodah:failsafe`
+* 1.5.x
+    * Updates on documentation
+    * Updates in some commands
 
 CLI application to communicate with host.
 
