@@ -106,7 +106,15 @@ public class KDHost implements AutoCloseable {
 	}
 
 	private Optional<String> getFromHost(KDHostElement e) {
-		return this.initObj(e).flatMap(this::retObj);
+		Optional<String> returnValue = null;
+		try {
+			returnValue = this.initObj(e).flatMap(this::retObj);
+
+		} catch (KDHostSqlException exc) {
+			log.severe("Host Communitation problem: " + exc.getMessage());
+			return Optional.empty();
+		}
+		return returnValue;
 	}
 
 	private Optional<String> retObj(String token) {

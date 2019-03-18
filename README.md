@@ -7,6 +7,8 @@
     * Added `getall` command
     * Updated Picocli version to 3.9.5
     * Updated JUnit 5.4
+    * Fixed issue with exception generated on host
+  
 * 1.7.x 
     * Updated Picocli version to 3.9.2
     * Use of `net.jodah:failsafe`
