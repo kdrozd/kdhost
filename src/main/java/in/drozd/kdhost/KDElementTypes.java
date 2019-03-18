@@ -765,15 +765,15 @@ public enum KDElementTypes {
 		if (!this.isListable())
 			return null;
 
-		return String.format("SELECT DISTINCT %s FROM %s ", this.getQueryColumns(), this.getTableForQuery());
+		return String.format("SELECT %s FROM %s ", this.getQueryColumns(), this.getTableForQuery());
 	}
 
 	public String getQuery(String tableName) {
 		if (!this.isListable())
 			return null;
 
-		return String.format("SELECT DISTINCT %s FROM %s WHERE %s='%s' ", this.getQueryColumns(),
-				this.getTableForQuery(), this.getTableNameField(), tableName);
+		return String.format("SELECT %s FROM %s WHERE %s='%s' ", this.getQueryColumns(), this.getTableForQuery(),
+				this.getTableNameField(), tableName);
 	}
 
 	protected String getTableNameField() {

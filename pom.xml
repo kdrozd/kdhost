@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>in.drozd.kdhost</groupId>
 	<artifactId>kdhost</artifactId>
-	<version>1.8.3</version>
+	<version>1.8.4</version>
 	<name>KDHost - CLI Host Client</name>
 
 	<properties>
