@@ -691,7 +691,7 @@ public enum KDElementTypes {
 	}
 
 	public static KDElementTypes typeForName(String name) {
-		switch (name) {
+		switch (name.toLowerCase()) {
 		case "table":
 		case "tables":
 			return KDElementTypes.TABLE;

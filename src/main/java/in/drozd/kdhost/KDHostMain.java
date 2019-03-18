@@ -129,7 +129,7 @@ public class KDHostMain implements Runnable {
 	void getall(
 			@Option(names = "-f", description = "Override file if it exist. Default value: ${DEFAULT-VALUE}", defaultValue = "false") boolean force,
 			@Option(names = "-r", description = "Download filer/record elements. Default value: ${DEFAULT-VALUE}", defaultValue = "false", hidden = true) boolean record,
-			@Parameters(paramLabel = "ELEMENT", index = "0..*", arity = "1..*", description = "Element(s) to get from host") List<KDElementTypes> elements) {
+			@Parameters(paramLabel = "ELEMENT", index = "0..*", arity = "1..*", description = "Element(s) to get from host") List<String> elements) {
 
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
@@ -137,7 +137,8 @@ public class KDHostMain implements Runnable {
 				host.setForceOverRide(force);
 			}
 			if (elements != null && !elements.isEmpty()) {
-				elements.stream().flatMap(host::streamElementsOfType).forEach(host::getElement);
+				elements.stream().map(s -> KDElementTypes.typeForName(s)).flatMap(host::streamElementsOfType)
+						.forEach(host::getElement);
 			}
 		}
 

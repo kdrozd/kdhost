@@ -497,7 +497,12 @@ public class KDHost implements AutoCloseable {
 			try (Statement st = conn.createStatement()) {
 				try (ResultSet rs = st.executeQuery(qry)) {
 					while (rs.next()) {
-						elements.add(new KDHostElement(rs, elementType));
+						KDHostElement he = new KDHostElement(rs, elementType);
+						if (!he.isLiteralColumnName()) {
+							elements.add(he);
+						} else {
+							log.fine("Skipping literal column: " + he.getFileName());
+						}
 					}
 				}
 			} catch (SQLException ex) {
