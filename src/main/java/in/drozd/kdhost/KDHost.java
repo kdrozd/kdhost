@@ -34,17 +34,17 @@ public class KDHost implements AutoCloseable {
 	protected final Logger log;
 
 	// For now they look similar but this one will support much more options later
-	private static final String	SANCHEZ_URL		= String.format("protocol=jdbc:sanchez/database=%s:SCA$IBS",
+	private static final String SANCHEZ_URL = String.format("protocol=jdbc:sanchez/database=%s:SCA$IBS",
 			System.getProperty("KDHOST_HOST", "127.0.0.1:49200"));
-	private static final String	FISGLOBAL_URL	= String.format("protocol=jdbc:fisglobal/database=%s:SCA$IBS",
+	private static final String FISGLOBAL_URL = String.format("protocol=jdbc:fisglobal/database=%s:SCA$IBS",
 			System.getProperty("KDHOST_HOST", "127.0.0.1:49200"));
 
 	private static final String EMPTY = "";
 
 	private static final String SUCCESS = "Success";
 
-	protected Connection	conn;
-	private boolean			overwriteFiles	= false;
+	protected Connection conn;
+	private boolean overwriteFiles = false;
 
 	public KDHost(Logger log) {
 		this.log = log;
@@ -439,11 +439,15 @@ public class KDHost implements AutoCloseable {
 				cs.setString(i, mrpcParameters[i - 1]);
 			}
 			cs.registerOutParameter(numberOfParameters, Types.VARCHAR, "KDRPCXRESPONSE");
+			long start = System.currentTimeMillis();
+
 			try (ResultSet rs1 = cs.executeQuery()) {
 				while (rs1.next()) {
 					response = rs1.getString("KDRPCXRESPONSE");
 				}
 			}
+			long end = System.currentTimeMillis();
+			log.fine("MRPC execution time[ms]: " + (end - start));
 		} catch (SQLException e) {
 			response = "";
 			log.severe(e.getMessage());
