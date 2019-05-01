@@ -432,29 +432,34 @@ public class KDHost implements AutoCloseable {
 		int numberOfParameters = mrpcParameters.length + 1; // +1 is for response parameter
 		final String mrpcCallString = "{call mrpc(" + mrpcid
 				+ String.join("", Collections.nCopies(numberOfParameters, ",?")) + ")}";
-
+		long start = 0L;
+		long end = 0L;
 		try (CallableStatement cs = conn.prepareCall(mrpcCallString);) {
 
 			for (int i = 1; i < numberOfParameters; i++) {
 				cs.setString(i, mrpcParameters[i - 1]);
 			}
 			cs.registerOutParameter(numberOfParameters, Types.VARCHAR, "KDRPCXRESPONSE");
-			long start = System.currentTimeMillis();
+			start = System.currentTimeMillis();
 
 			try (ResultSet rs1 = cs.executeQuery()) {
 				while (rs1.next()) {
 					response = rs1.getString("KDRPCXRESPONSE");
 				}
 			}
-			long end = System.currentTimeMillis();
-			log.fine("MRPC execution time[ms]: " + (end - start));
+			end = System.currentTimeMillis();
 		} catch (SQLException e) {
+			if (end == 0L) {
+				end = System.currentTimeMillis();
+			}
 			response = "";
 			log.severe(e.getMessage());
 			errors = e.getMessage();
 		} finally {
 			// FIXME: Move this out, and return touple with response in client class
-
+			if (end == 0L) {
+				end = System.currentTimeMillis();
+			}
 			// This is output not logs
 			System.out.println("RESPONSE: " + response);
 			if (!errors.isEmpty()) {
@@ -462,6 +467,7 @@ public class KDHost implements AutoCloseable {
 				System.err.println("ERROR   " + errors);
 			}
 		}
+		log.fine("MRPC execution time[ms]: " + (end - start));
 		log.exiting(KDHost.class.getName(), "callMrpc");
 
 	}
