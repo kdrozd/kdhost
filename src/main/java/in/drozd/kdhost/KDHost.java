@@ -460,6 +460,7 @@ public class KDHost implements AutoCloseable {
 			if (end == 0L) {
 				end = System.currentTimeMillis();
 			}
+			
 			// This is output not logs
 			System.out.println("RESPONSE: " + response);
 			if (!errors.isEmpty()) {
