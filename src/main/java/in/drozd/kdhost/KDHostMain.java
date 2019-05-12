@@ -43,14 +43,14 @@ import picocli.CommandLine.Parameters;
 )
 public class KDHostMain implements Runnable {
 	// Using JUL to avoid external dependencies
-	private static final String	DEFAULT_LOG_LEVEL_STR	= "WARNING";
-	private static final Level	DEFAULT_LOG_LEVEL_LEVEL	= Level.WARNING;
+	private static final String DEFAULT_LOG_LEVEL_STR = "WARNING";
+	private static final Level DEFAULT_LOG_LEVEL_LEVEL = Level.WARNING;
 
 	protected static final Logger log = Logger.getLogger(KDHostMain.class.getName());
 
 	// For WATCH command
-	private WatchService	watcher		= null;
-	private GitIgnore		gitIgnore	= null;
+	private WatchService watcher = null;
+	private GitIgnore gitIgnore = null;
 
 	private Map<WatchKey, Path> keys = null;
 
@@ -172,12 +172,18 @@ public class KDHostMain implements Runnable {
 	@Command(description = "Execute mrpc code on host", mixinStandardHelpOptions = true, versionProvider = in.drozd.kdhost.cliutils.KDHostVersionInformation.class)
 	void mrpc(@Option(names = {
 			"--mv" }, paramLabel = "VERSION", defaultValue = "1", description = "MRPC version to use, default: ${DEFAULT-VALUE}", hidden = false) String mrpcVersion,
+			@Option(names = "-r", description = "Repeat call, default: ${DEFAULT-VALUE}\"", paramLabel = "N", defaultValue = "1") int repeat,
 			@Parameters(index = "0", arity = "1", description = "MRPC ID", paramLabel = "MRPC_ID") String mrpcid,
 			@Parameters(index = "1..*", arity = "0..*", description = "MRPC parameters", paramLabel = "PARAMETERS") String[] parameters) {
 		try (KDHost host = new KDHost(log)) {
 			host.connectToHost();
 			// TODO: callMRPC should return something that will be printed
-			host.callMrpc(mrpcid, mrpcVersion, parameters);
+			long start = System.currentTimeMillis();
+			for (int i = 0; i < repeat; i++) {
+				host.callMrpc(mrpcid, mrpcVersion, parameters);
+			}
+
+			log.fine("Exec time: " + (System.currentTimeMillis() - start));
 		}
 
 	}
