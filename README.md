@@ -158,6 +158,7 @@ This command can be used to call any MRPC from host. User his class should have 
 
 Available options:
 
+* `-r N` Repeat call `N` times.
 * `-mv,--mrpc-version` MRPC version to use, default: "1"
 * `-dp, --describe-parameters` - Get list of MRPC parameters, Not supported in PIP.
 
